@@ -1,6 +1,5 @@
 from manim import *
 
-
 class Util():
     AMOUNT_FONT_SIZE = 25
 
@@ -9,7 +8,6 @@ class Util():
         downTriange = Triangle(fill_opacity=1).scale(0.25).next_to(upTriange, DOWN, buff=-0.05)
         tri_group = VGroup(upTriange, downTriange)
         return tri_group
-
 
 class Dest(Scene):
 
@@ -90,7 +88,6 @@ class Dest(Scene):
                   )
         self.wait(2)
 
-
 class SCT(Scene):
 
     def construct(self):
@@ -160,8 +157,6 @@ class SCT(Scene):
         self.wait(2)
 
 class SCTM(Scene):
-
-    AMOUNT_FONT_SIZE = 25
 
     def construct(self):
         # Parties
