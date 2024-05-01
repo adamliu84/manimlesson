@@ -1,9 +1,17 @@
 from manim import *
 
 
-class Dest(Scene):
-
+class Util():
     AMOUNT_FONT_SIZE = 25
+
+    def GenHourGlass():
+        upTriange = Triangle(fill_opacity=1).rotate(180*DEGREES).scale(0.25)
+        downTriange = Triangle(fill_opacity=1).scale(0.25).next_to(upTriange, DOWN, buff=-0.05)
+        tri_group = VGroup(upTriange, downTriange)
+        return tri_group
+
+
+class Dest(Scene):
 
     def construct(self):
         # Parties
@@ -24,7 +32,7 @@ class Dest(Scene):
         self.wait()
 
         # Charges
-        charge_amount = Text("100", font_size=self.AMOUNT_FONT_SIZE).next_to(
+        charge_amount = Text("100", font_size=Util.AMOUNT_FONT_SIZE).next_to(
             platformAccountVGroup, LEFT, buff=1).shift(UP*1.5)
         self.play(Write(charge_amount))
         self.play(charge_amount.animate.shift(RIGHT*2.75), run_time=1)
@@ -32,9 +40,9 @@ class Dest(Scene):
         self.play(charge_amount.animate.shift(RIGHT*5), run_time=1)
 
         # Charge Fee Split
-        application_amount = Text("20", font_size=self.AMOUNT_FONT_SIZE).next_to(
+        application_amount = Text("20", font_size=Util.AMOUNT_FONT_SIZE).next_to(
             charge_amount, DOWN, buff=0.75).shift(LEFT*0.75)
-        merchant_amount = Text("80", font_size=self.AMOUNT_FONT_SIZE).next_to(
+        merchant_amount = Text("80", font_size=Util.AMOUNT_FONT_SIZE).next_to(
             charge_amount, DOWN, buff=0.75).shift(RIGHT*0.75)
         charge_application_arrow = Line(start=charge_amount.get_bottom(),
                                         end=application_amount.get_top()).add_tip()
@@ -51,9 +59,9 @@ class Dest(Scene):
         )
 
         # Application Fee Split
-        stripe_amount = Text("3", font_size=self.AMOUNT_FONT_SIZE).next_to(
+        stripe_amount = Text("3", font_size=Util.AMOUNT_FONT_SIZE).next_to(
             application_amount, DOWN, buff=0.75).shift(LEFT*0.75)
-        platform_amount = Text("17", font_size=self.AMOUNT_FONT_SIZE).next_to(
+        platform_amount = Text("17", font_size=Util.AMOUNT_FONT_SIZE).next_to(
             application_amount, DOWN, buff=0.75).shift(RIGHT*0.75)
         application_stripe_arrow = Line(start=application_amount.get_bottom(),
                                         end=stripe_amount.get_top()).add_tip()
@@ -80,11 +88,10 @@ class Dest(Scene):
                   FadeOut(platform_payout_arrow), FadeOut(
                       merchant_payout_arrow)
                   )
+        self.wait(2)
 
 
 class SCT(Scene):
-
-    AMOUNT_FONT_SIZE = 25
 
     def construct(self):
         # Parties
@@ -105,7 +112,7 @@ class SCT(Scene):
         self.wait()
 
         # Charges
-        charge_amount = Text("100", font_size=self.AMOUNT_FONT_SIZE).next_to(
+        charge_amount = Text("100", font_size=Util.AMOUNT_FONT_SIZE).next_to(
             platformAccountVGroup, LEFT, buff=1).shift(UP*1.5)
         self.play(Write(charge_amount))
         self.play(charge_amount.animate.shift(RIGHT*2.75), run_time=1)
@@ -114,13 +121,13 @@ class SCT(Scene):
         # Holding fund
         self.play(charge_amount.animate.shift(DOWN*0.5))
         holding_amount = Text(
-            "97", font_size=self.AMOUNT_FONT_SIZE).move_to(charge_amount)
+            "97", font_size=Util.AMOUNT_FONT_SIZE).move_to(charge_amount)
         stripe_amount = Text(
-            "3", font_size=self.AMOUNT_FONT_SIZE).move_to(charge_amount)
+            "3", font_size=Util.AMOUNT_FONT_SIZE).move_to(charge_amount)
         self.play(Transform(charge_amount, holding_amount),
                   stripe_amount.animate.shift(LEFT*2))
         self.wait(0.25)
-        hourGlass = self.hourGlassGroup()
+        hourGlass = Util.GenHourGlass()
         hourGlass.next_to(platformAccountVGroup, RIGHT, buff=-0.4)
         self.add(hourGlass)
         self.play(Rotate(hourGlass, angle=10*PI,
@@ -131,9 +138,9 @@ class SCT(Scene):
         self.remove(charge_amount)
         self.play(holding_amount.animate.shift(DOWN*0.5))
         platform_amount = Text(
-            "17", font_size=self.AMOUNT_FONT_SIZE).move_to(holding_amount)
+            "17", font_size=Util.AMOUNT_FONT_SIZE).move_to(holding_amount)
         merchant_amount = Text(
-            "80", font_size=self.AMOUNT_FONT_SIZE).move_to(holding_amount)
+            "80", font_size=Util.AMOUNT_FONT_SIZE).move_to(holding_amount)
         self.remove(hourGlass)
         self.play(Transform(holding_amount, platform_amount),
                   merchant_amount.animate.move_to([connectAccountVGroup.get_x(), holding_amount.get_y(), 0]))
@@ -153,13 +160,6 @@ class SCT(Scene):
                       merchant_payout_arrow)
                   )
         self.wait(2)
-
-    def hourGlassGroup(self):
-        upTriange = Triangle().rotate(180*DEGREES).scale(0.25)
-        downTriange = Triangle().scale(0.25).next_to(upTriange, DOWN, buff=-0.05)
-        tri_group = VGroup(upTriange, downTriange)
-        return tri_group
-
 
 class SCTM(Scene):
 
@@ -191,7 +191,7 @@ class SCTM(Scene):
         self.wait()
 
         # Charges
-        charge_amount = Text("100", font_size=self.AMOUNT_FONT_SIZE).next_to(
+        charge_amount = Text("100", font_size=Util.AMOUNT_FONT_SIZE).next_to(
             platformAccountVGroup, LEFT, buff=1).shift(UP*1.5)
         self.play(Write(charge_amount))
         self.play(charge_amount.animate.shift(RIGHT*2.75), run_time=1)
@@ -200,13 +200,13 @@ class SCTM(Scene):
         # Holding fund
         self.play(charge_amount.animate.shift(DOWN*0.5))
         holding_amount = Text(
-            "97", font_size=self.AMOUNT_FONT_SIZE).move_to(charge_amount)
+            "97", font_size=Util.AMOUNT_FONT_SIZE).move_to(charge_amount)
         stripe_amount = Text(
-            "3", font_size=self.AMOUNT_FONT_SIZE).move_to(charge_amount)
+            "3", font_size=Util.AMOUNT_FONT_SIZE).move_to(charge_amount)
         self.play(Transform(charge_amount, holding_amount),
                   stripe_amount.animate.shift(LEFT*2))
         self.wait(0.25)
-        hourGlass = self.hourGlassGroup()
+        hourGlass = Util.GenHourGlass()
         hourGlass.next_to(platformAccountVGroup, RIGHT, buff=-0.4)
         self.add(hourGlass)
         self.play(Rotate(hourGlass, angle=10*PI,
@@ -217,11 +217,11 @@ class SCTM(Scene):
         self.remove(charge_amount)
         self.play(holding_amount.animate.shift(DOWN*0.5))
         platform_amount = Text(
-            "17", font_size=self.AMOUNT_FONT_SIZE).move_to(holding_amount)
+            "17", font_size=Util.AMOUNT_FONT_SIZE).move_to(holding_amount)
         merchant_amount = Text(
-            "50", font_size=self.AMOUNT_FONT_SIZE).move_to(holding_amount)
+            "50", font_size=Util.AMOUNT_FONT_SIZE).move_to(holding_amount)
         merchant2_amount = Text(
-            "30", font_size=self.AMOUNT_FONT_SIZE).move_to(holding_amount)
+            "30", font_size=Util.AMOUNT_FONT_SIZE).move_to(holding_amount)
         self.remove(hourGlass)
         self.play(Transform(holding_amount, platform_amount),
                   merchant_amount.animate.move_to(
@@ -248,9 +248,3 @@ class SCTM(Scene):
                       merchant_payout_arrow), FadeOut(merchant2_payout_arrow)
                   )
         self.wait(2)
-
-    def hourGlassGroup(self):
-        upTriange = Triangle().rotate(180*DEGREES).scale(0.25)
-        downTriange = Triangle().scale(0.25).next_to(upTriange, DOWN, buff=-0.05)
-        tri_group = VGroup(upTriange, downTriange)
-        return tri_group
