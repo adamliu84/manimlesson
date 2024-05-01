@@ -124,7 +124,7 @@ class SCT(Scene):
             "97", font_size=Util.AMOUNT_FONT_SIZE).move_to(charge_amount)
         stripe_amount = Text(
             "3", font_size=Util.AMOUNT_FONT_SIZE).move_to(charge_amount)
-        self.play(Transform(charge_amount, holding_amount),
+        self.play(ReplacementTransform(charge_amount, holding_amount),
                   stripe_amount.animate.shift(LEFT*2))
         self.wait(0.25)
         hourGlass = Util.GenHourGlass()
@@ -135,14 +135,13 @@ class SCT(Scene):
         self.wait()
 
         # Fee Split
-        self.remove(charge_amount)
         self.play(holding_amount.animate.shift(DOWN*0.5))
         platform_amount = Text(
             "17", font_size=Util.AMOUNT_FONT_SIZE).move_to(holding_amount)
         merchant_amount = Text(
             "80", font_size=Util.AMOUNT_FONT_SIZE).move_to(holding_amount)
         self.remove(hourGlass)
-        self.play(Transform(holding_amount, platform_amount),
+        self.play(ReplacementTransform(holding_amount, platform_amount),
                   merchant_amount.animate.move_to([connectAccountVGroup.get_x(), holding_amount.get_y(), 0]))
         self.wait()
 
@@ -152,7 +151,6 @@ class SCT(Scene):
         merchant_payout_arrow = Line(start=merchant_amount.get_bottom(
         ), end=connectAccountVGroup.get_bottom()+[0, -0.5, 0], color=RED).add_tip()
         self.play(FadeIn(platform_payout_arrow), FadeIn(merchant_payout_arrow))
-        self.remove(holding_amount)
         self.play(platform_amount.animate.next_to(platformAccountVGroup, DOWN, buff=0.2),
                   merchant_amount.animate.next_to(
                       connectAccountVGroup, DOWN, buff=0.2),
@@ -203,7 +201,7 @@ class SCTM(Scene):
             "97", font_size=Util.AMOUNT_FONT_SIZE).move_to(charge_amount)
         stripe_amount = Text(
             "3", font_size=Util.AMOUNT_FONT_SIZE).move_to(charge_amount)
-        self.play(Transform(charge_amount, holding_amount),
+        self.play(ReplacementTransform(charge_amount, holding_amount),
                   stripe_amount.animate.shift(LEFT*2))
         self.wait(0.25)
         hourGlass = Util.GenHourGlass()
@@ -214,7 +212,6 @@ class SCTM(Scene):
         self.wait()
 
         # Fee Split
-        self.remove(charge_amount)
         self.play(holding_amount.animate.shift(DOWN*0.5))
         platform_amount = Text(
             "17", font_size=Util.AMOUNT_FONT_SIZE).move_to(holding_amount)
@@ -223,7 +220,7 @@ class SCTM(Scene):
         merchant2_amount = Text(
             "30", font_size=Util.AMOUNT_FONT_SIZE).move_to(holding_amount)
         self.remove(hourGlass)
-        self.play(Transform(holding_amount, platform_amount),
+        self.play(ReplacementTransform(holding_amount, platform_amount),
                   merchant_amount.animate.move_to(
                       [connectAccountVGroup.get_x(), holding_amount.get_y(), 0]),
                   merchant2_amount.animate.move_to([connectAccount2VGroup.get_x(), holding_amount.get_y(), 0]))
@@ -238,7 +235,6 @@ class SCTM(Scene):
         ), end=connectAccount2VGroup.get_bottom()+[0, -0.5, 0], color=RED).add_tip()
         self.play(FadeIn(platform_payout_arrow), FadeIn(
             merchant_payout_arrow), FadeIn(merchant2_payout_arrow))
-        self.remove(holding_amount)
         self.play(platform_amount.animate.next_to(platformAccountVGroup, DOWN, buff=0.2),
                   merchant_amount.animate.next_to(
                       connectAccountVGroup, DOWN, buff=0.2),
