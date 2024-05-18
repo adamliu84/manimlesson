@@ -206,3 +206,146 @@ class ShapeFromProportionExample(Scene):
                 self.add(d)
                 self.wait(0.1)
         self.wait(1)
+
+
+class SubCurveExample(Scene):
+    def construct(self):
+        sg = ScreenGrid()
+        sg.fade(0.5)
+        self.add(sg)
+
+        def coord(x, y):
+            return np.array([x, y, 0])
+
+        points = [
+            coord(x, y)
+            for x, y in [
+                (-6, 3),
+                (-1.5, -1),
+                (0, 0),
+                (2, -3),
+                (3.5, 2)
+            ]
+        ]
+
+        path = VMobject(color=BLUE).set_points_smoothly(points)
+        partial_path = path.get_subcurve(0.1, 0.9)
+        partial_path.set_style(stroke_width=10, stroke_color=RED)
+
+        self.add(path, partial_path)
+        self.wait(1)
+        # Trying out MoveAlongPath
+        dot = Dot(color=GREY_BROWN, radius=0.5)
+        self.play(
+            MoveAlongPath(dot, partial_path),
+            rate_func=linear,
+            run_time=3
+        )
+
+
+class TexColorExample(Scene):
+    def construct(self):
+        equation = MathTex(
+            r"e^x = x^0 + x^1 + \frac{1}{2} x^2 + \frac{1}{6} x^3 + \cdots + \frac{1}{n!} x^n + \cdots",
+            substrings_to_isolate=["x", "+"]
+        )
+
+        equation.save_state()  # Saved state prior to coloring changes
+        equation.set_color_by_tex("+", YELLOW)
+        equation.set_color_by_tex("x", BLUE)
+        equation.width = config.frame_width - 1
+        self.add(equation)
+        # equation.save_state()
+        self.wait()
+
+        text_2 = Tex("Modified")\
+            .set(width=config.frame_width/1.5)\
+            .set_color(ORANGE)\
+            .to_corner(DL)
+        self.play(Transform(equation, text_2))
+        self.wait()
+        self.play(Restore(equation))
+
+
+class SurroundExample(Scene):
+    def construct(self):
+        formula = MathTex("x", "=", "y", "+", "3").scale(4)
+
+        sm1 = Circle().surround(formula[0])  # buffer_factor=1.2) by default
+        sm2 = Circle().surround(formula[1], buffer_factor=1)
+        sm3 = Rectangle(color=PURPLE).surround(formula[2])
+        sm4 = Rectangle(color=YELLOW).surround(
+            formula[2], stretch=True)  # To fix the ratio
+
+        self.add(
+            formula,
+            sm1, sm2, sm3, sm4
+        )
+        self.wait()
+
+        sm1.generate_target()
+        sm1.target.surround(formula[-1], buffer_factor=3)
+        self.play(MoveToTarget(sm1))
+
+
+class BackgroundRectangleExample(Scene):
+    def construct(self):
+        number_plane = NumberPlane(axis_config={"include_numbers": True})
+
+        matrix = VGroup(*[Text(f"{i}") for i in range(27)]
+                        ).arrange_in_grid(cols=6, buff=1)
+        _0 = matrix[0]
+        _16 = matrix[16]
+        _13 = matrix[13]
+
+        _16.add_background_rectangle()
+        _0.add_background_rectangle(color=RED)
+        _13.add_background_rectangle(color=YELLOW, buff=0.2)
+
+        self.add(
+            number_plane, matrix
+        )
+        self.wait()
+
+        _12 = matrix[12]
+        _12.add_background_rectangle(color=BLUE, buff=0.2)
+        self.wait(0.5)
+        _2 = matrix[2]
+        _2.add_background_rectangle(color=GOLD, buff=0.2)
+        self.wait(3)
+        self.remove(number_plane, matrix)
+        self.wait()
+
+        # https://docs.manim.community/en/stable/reference/manim.mobject.table.Table.html
+        t0 = Table(
+            [["This", "is a"],
+             ["simple", "Table in \n Manim."]])
+        t1 = Table(
+            [["This", "is a"],
+             ["simple", "Table."]],
+            row_labels=[Text("R1"), Text("R2")],
+            col_labels=[Text("C1"), Text("C2")])
+        t1.add_highlighted_cell((2, 2), color=YELLOW)
+        t2 = Table(
+            [["This", "is a"],
+             ["simple", "Table."]],
+            row_labels=[Text("R1"), Text("R2")],
+            col_labels=[Text("C1"), Text("C2")],
+            top_left_entry=Star().scale(0.3),
+            include_outer_lines=True,
+            arrange_in_grid_config={"cell_alignment": RIGHT})
+        t2.add(t2.get_cell((2, 2), color=RED))
+        t3 = Table(
+            [["This", "is a"],
+             ["simple", "Table."]],
+            row_labels=[Text("R1"), Text("R2")],
+            col_labels=[Text("C1"), Text("C2")],
+            top_left_entry=Star().scale(0.3),
+            include_outer_lines=True,
+            line_config={"stroke_width": 1, "color": YELLOW})
+        t3.remove(*t3.get_vertical_lines())
+        g = Group(
+            t0, t1, t2, t3
+        ).scale(0.7).arrange_in_grid(buff=1)
+        self.add(g)
+        self.wait()
