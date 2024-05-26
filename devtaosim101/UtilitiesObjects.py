@@ -172,3 +172,219 @@ main = do
 
         self.add(VGroup(rendered_code, rendered_output).arrange(DOWN).scale(0.5))
         self.wait()
+
+
+class BracesExample(Scene):
+    def construct(self):
+        start = Dot([-2, -1, 0])
+        end = Dot([2,  1, 0])
+        line = Line(start.get_center(), end.get_center(), color=ORANGE)
+        down_brace = Brace(line)
+        left_brace = Brace(line, LEFT, buff=2)
+        right_brace = Brace(line, RIGHT)
+        down_brace_tex = down_brace.get_text("Down brace")
+        left_brace_tex = left_brace.get_text("Left brace")
+
+        # normal_brace = Brace(line, direction=rotate_vector(
+        #     line.get_unit_vector(), 90*DEGREES))
+        normal_brace = always_redraw(
+            lambda:
+                Brace(line, direction=rotate_vector(
+                    line.get_unit_vector(), 90*DEGREES))
+        )
+        #                                   --------------------------------------------------
+        #                                                   normal vector
+        # rotate_vector is a function that, as the name suggests, rotates a vector.
+        # normal_brace_tex = normal_brace.get_tex("x-x_1")
+        normal_brace_tex = always_redraw(lambda: normal_brace.get_tex("x-x_1"))
+        self.add(
+            line, start, end,
+            down_brace, down_brace_tex,
+            left_brace, left_brace_tex,
+            right_brace,
+            normal_brace, normal_brace_tex,
+        )
+        self.play(line.animate.put_start_and_end_on([-2, 1, 0], [1, 0, 0]))
+        self.wait()
+
+
+class DecimalNumberExample(Scene):
+    def construct(self):
+        dgrp = VGroup(
+            DecimalNumber(0),
+            DecimalNumber(1, include_sign=True),
+            DecimalNumber(1, unit="\\rm m"),
+            DecimalNumber(13.41364, unit="\\rm m", num_decimal_places=3),
+            DecimalNumber(133414.41364, unit="\\rm m", num_decimal_places=3),
+            DecimalNumber(133414.41364, unit="\\rm m",
+                          num_decimal_places=3, group_with_commas=False),
+        ).scale(2.5).arrange(DOWN)
+        self.add(dgrp)
+        self.wait()
+
+
+class NumberLineExample(Scene):
+    def construct(self):
+
+        vt = ValueTracker(2)
+
+        l0 = NumberLine(
+            #        min max step
+            x_range=[-10, 10, 1],
+            length=10,
+            color=BLUE,
+            include_numbers=True,
+            label_direction=UP,
+            font_size=20,
+        )
+
+        l1 = NumberLine(
+            x_range=[-10, 10, 2],
+            unit_size=0.5,
+            numbers_with_elongated_ticks=[-2, 4],
+            include_numbers=True,
+            font_size=24,
+        )
+        [num6] = [num for num in l1.numbers if num.number == 6]
+        num6.set_color(RED)
+        l1.add(num6)
+
+        l2 = NumberLine(
+            x_range=[-2.5, 2.5 + 0.5, 0.5],
+            length=12,
+            # Here they are modifying the parameters of the numbers,
+            # the number of decimal places.
+            decimal_number_config={
+                "num_decimal_places": 1,
+                "unit": "\\rm m",
+                "color": TEAL
+            },
+            include_numbers=True,
+            font_size=30,
+        )
+
+        l3 = NumberLine(
+            x_range=[-5, 5 + 1, 1],
+            length=6,
+            include_tip=True,
+            include_numbers=True,
+            rotation=10 * DEGREES,
+        )
+
+        line_group = VGroup(l0, l1, l2, l3).arrange(DOWN, buff=1)
+
+        pink_dot = Dot(l0.n2p(-3), color=PINK)
+        moving_white_dot = always_redraw(
+            lambda: Dot(l1.n2p(vt.get_value()), color=WHITE))
+        orange_dot = Dot(l3.n2p(1.5), color=ORANGE)
+        moving_gold_dot = always_redraw(
+            lambda: Dot(l3.n2p(vt.get_value()), color=GOLD))
+
+        self.add(line_group, pink_dot, orange_dot)
+        self.add(moving_white_dot, moving_gold_dot)
+        self.play(vt.animate.set_value(10), run_time=2)
+        self.play(vt.animate.set_value(-6), run_time=2)
+        self.wait()
+
+
+class MatrixExample(Scene):
+    def construct(self):
+        m0 = Matrix([
+            ["\\pi", 0],
+            [-1,     1]
+        ])
+        m1 = Matrix([
+            ["π", "0"],
+            ["-1", "1"]
+        ],
+            element_to_mobject=Text,
+            element_to_mobject_config={"font": "Arial"}
+        )
+        m2 = IntegerMatrix([
+            [1.5, 0.],
+            [12, -1.3]
+        ],
+            left_bracket="(",
+            right_bracket=")"
+        )
+        m3 = DecimalMatrix(
+            [[3.456, 2.122], [33.2244, 12.33]],
+            element_to_mobject_config={"num_decimal_places": 2},
+            left_bracket="\\{",
+            right_bracket="\\}")
+        m4 = MobjectMatrix([
+            [Circle().scale(0.3),      Square().scale(0.3)],
+            [MathTex("\\pi").scale(2), Star().scale(0.3)]
+        ],
+            left_bracket="\\langle",
+            right_bracket="\\rangle"
+        )
+        g = Group(m0, m1, m2, m3).arrange_in_grid(buff=1).to_edge(UP)
+        m4.next_to(g, DOWN, buff=1)
+        g.add(m4)
+        self.add(g)
+        self.wait()
+
+        m4c = m4.copy().move_to(m1)
+        self.play(ReplacementTransform(m1, m4c))
+        self.wait()
+
+
+class TableExample(Scene):
+    def construct(self):
+        # Table -------------------------------------------------
+        t0 = Table([
+            ["First", "Second"],
+            ["Third", "Fourth"]
+        ],
+            row_labels=[Text("R1"), Text("R2")],
+            col_labels=[Text("C1"), Text("C2")],
+            top_left_entry=Text("TOP"))
+        #                     (row,col) not start from 0, 1 instead
+        t0.add_highlighted_cell((2, 3), color=GREEN)
+        # DecimalTable ------------------------------------------
+        x_vals = np.linspace(-2, 2, 5)
+        y_vals = np.exp(x_vals)
+        t1 = DecimalTable(
+            [x_vals, y_vals],
+            row_labels=[MathTex("x"), MathTex("f(x)")],
+            include_outer_lines=True)
+        t1.add(t1.get_cell((2, 2), color=RED))
+        # MathTable ---------------------------------------------
+        t2 = MathTable(
+            [["+", 0, 5, 10],
+             [0, 0, 5, 10],
+             [2, 2, 7, 12],
+             [4, 4, 9, 14]],
+            include_outer_lines=True)
+        t2.get_horizontal_lines()[:3].set_color(ORANGE)
+        t2.get_vertical_lines()[:3].set_color(ORANGE)
+        t2.get_vertical_lines()[3].set_color(PINK)
+        t2.get_vertical_lines()[4].set_color(YELLOW)
+        t2.get_horizontal_lines()[:3].set_z_index(1)
+        # MobjectTable ------------------------------------------
+        cross = VGroup(
+            Line(UP + LEFT, DOWN + RIGHT),
+            Line(UP + RIGHT, DOWN + LEFT)
+        ).set_color(BLUE).scale(0.5)
+        a = Circle().set_color(RED).scale(0.5)
+        b = cross
+        t3 = MobjectTable([
+            [a.copy(), b.copy(), a.copy()],
+            [b.copy(), a.copy(), a.copy()],
+            [a.copy(), b.copy(), b.copy()]
+        ])
+        t3.add(Line(
+            t3.get_corner(DL), t3.get_corner(UR)
+        ).set_color(RED))
+        vals = np.arange(1, 21).reshape(5, 4)
+        t4 = IntegerTable(
+            vals,
+            include_outer_lines=True
+        )
+        grp = Group(
+            Group(t0, t1)    .scale(0.5).arrange(buff=1).to_edge(UP, buff=1),
+            Group(t2, t3, t4).scale(0.5).arrange(buff=1).to_edge(DOWN, buff=1)
+        )
+        self.add(grp)
+        self.wait()
