@@ -520,3 +520,84 @@ class CutoutExample(Scene):
         self.play(MoveAlongPath(movingArcPointSq,
                   exclusion_result), run_time=2)
         self.wait()
+
+
+class ClassAnimationsExample(Scene):
+    def construct(self):
+        # 【Text】
+        text_animations = [
+            AddTextLetterByLetter,
+            Write,
+        ]
+        text = Text("Hello World")
+        for i in range(len(text_animations)):
+            self.play(text_animations[i](text), run_time=2)
+        self.remove(text)
+
+        # 【Shape】
+        shape_animations = [
+            Create,
+            DrawBorderThenFill,
+            FadeIn,
+            GrowFromCenter,
+            GrowFromEdge,
+            GrowFromPoint,
+            SpinInFromNothing
+        ]
+        sq = Square(fill_color=RED, fill_opacity=1)
+        # self.add(sq)
+        self.wait()
+
+        for i in range(len(shape_animations)):
+            if shape_animations[i] is GrowFromEdge:
+                self.play(GrowFromEdge(sq, DOWN))
+            elif shape_animations[i] is GrowFromPoint:
+                self.play(GrowFromPoint(sq, UR*2))
+            else:
+                self.play(shape_animations[i](sq))
+
+
+class IndicationExample(Scene):
+    def construct(self):
+        indications = [
+            # Indications that need only the Mobject to be highlighted
+            ApplyWave,
+            Circumscribe,
+            FocusOn,
+            Indicate,
+            Wiggle,
+            # Indications that need another argument
+            # This needs a background Mobject, such as Underline or a VMobject with surround
+            ShowPassingFlash,
+            Flash,  # This needs a coord
+        ]
+        names = [Tex(i.__name__).scale(3) for i in indications]
+
+        def finFunc(i):
+            if (i+1 < len(names)):
+                return FadeIn(names[(i+1) % len(names)], shift=UP*1.5)
+            else:
+                return Write(Text("Fin").to_edge(DR).scale(0.5)),
+
+        self.add(names[0])
+        for i in range(len(names)):
+            if indications[i] is Flash:
+                # Flash needs a coord
+                self.play(Flash(UP))
+            elif indications[i] is ShowPassingFlash:
+                self.play(ShowPassingFlash(Underline(names[i])))
+                self.play(
+                    ShowPassingFlash(
+                        RoundedRectangle(color=RED).surround(
+                            names[i], stretch=True, buff=1.3),
+                        time_width=0.5
+                    ),
+                    run_time=2
+                )
+            else:
+                self.play(indications[i](names[i]))
+            self.play(AnimationGroup(
+                FadeOut(names[i], shift=UP*1.5),
+                finFunc(i)
+            ))
+        self.wait(2)
