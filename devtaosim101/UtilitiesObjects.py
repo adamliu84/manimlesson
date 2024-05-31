@@ -388,3 +388,135 @@ class TableExample(Scene):
         )
         self.add(grp)
         self.wait()
+
+        # Un-highlight cell https://www.reddit.com/r/manim/comments/10fnanm/manim_undo_highlighting_cell_in_table/
+        self.play(t0[0].animate.set_opacity(0))
+        self.wait()
+
+
+class AngleExample(Scene):
+    def construct(self):
+        number_plane = NumberPlane(axis_config={"include_numbers": True})
+        number_plane.set_opacity(0.3)
+
+        # 【Arc】
+        # start_angle, increment angle
+        movingArc = Arc(2, 20*DEGREES, 80*DEGREES, color=GOLD)
+        arcs = VGroup(
+            Arc(radius=1),
+            # ---------------------------
+            Circle(radius=2, stroke_opacity=0.4),
+            movingArc,
+            # ---------------------------
+            Circle(radius=3, stroke_opacity=0.4, color=BLUE),
+            Arc(3, 300*DEGREES, (60+90)*DEGREES),
+            # ---------------------------
+            Circle(radius=1.5, stroke_opacity=0.4,
+                   color=YELLOW, arc_center=[2, 2, 0]),
+            Arc(1.5, -30*DEGREES, 60*DEGREES, arc_center=[2, 2, 0]),
+        )
+
+        dot = Dot(arcs[-1].get_arc_center(), color=YELLOW)
+        self.add(number_plane, arcs, dot)
+        # Moving Arc #1 move
+        self.play(movingArc.animate.rotate_about_origin(90*DEGREES))
+        self.wait()
+        # Moving Arc #2 move
+        # Cheap way of moving & rotating arc. Should be using add_updater instead?
+        # Also not using rotate_about_origin to try out rotate
+        for i in range(1, 10):
+            # self.play(movingArc.animate.rotate_about_origin(
+            #     10*DEGREES), run_time=0.05)
+            self.play(movingArc.animate.rotate(
+                10*DEGREES,
+                about_point=movingArc.get_arc_center()
+            ), run_time=0.05)
+        self.wait()
+        # Moving Arc #3 move
+        movingArcDest = Arc(2, 280*DEGREES, 80*DEGREES, color=PURPLE)
+        self.play(ReplacementTransform(movingArc, movingArcDest))
+        self.wait()
+
+        # 【ArcBetweenPoints】
+        non_origin_circle = arcs[5]
+        start = Dot(non_origin_circle.point_at_angle(
+            135*DEGREES), color=ORANGE)
+        end = Dot(non_origin_circle.point_at_angle(225*DEGREES), color=PINK)
+        arcbp = ArcBetweenPoints(
+            start.get_center(),
+            end.get_center(),
+            # 225 - 135 = 90
+            angle=90*DEGREES
+        )
+        self.add(number_plane, arcbp, start, end)
+        self.wait()
+        movingArcPointSq = Square(
+            side_length=0.3, fill_color=BLUE, fill_opacity=1).move_to(start)
+        movingArcPointSq.set_stroke(width=0)
+        self.add(movingArcPointSq)
+        self.play(MoveAlongPath(movingArcPointSq, arcbp), run_time=3)
+        self.wait()
+
+
+class ArcPolygonsExample(Scene):
+    def construct(self):
+        # https://docs.manim.community/en/stable/reference/manim.mobject.geometry.arc.ArcPolygon.html
+        a = [0, 0, 0]
+        b = [2, 0, 0]
+        c = [0, 2, 0]
+        ap1 = ArcPolygon(a, b, c, radius=2)
+        ap2 = ArcPolygon(a, b, c, angle=45*DEGREES)
+        ap3 = ArcPolygon(a, b, c, arc_config={'radius': 1.7, 'color': RED})
+        ap4 = ArcPolygon(a, b, c, color=RED, fill_opacity=1,
+                         arc_config=[{'radius': 1.7, 'color': RED},
+                                     {'angle': 20*DEGREES, 'color': BLUE},
+                                     {'radius': 1}])
+        ap_group = VGroup(ap1, ap2, ap3, ap4).arrange()
+        self.play(*[Create(ap) for ap in [ap1, ap2, ap3, ap4]])
+        self.wait()
+
+        movingArcPointSq = Square(
+            side_length=0.3, fill_color=BLUE, fill_opacity=1).move_to(ap2.get_all_points()[0])
+        self.add(movingArcPointSq)
+        self.play(MoveAlongPath(movingArcPointSq, ap2), run_time=3)
+        self.wait()
+
+
+class CutoutExample(Scene):
+    def construct(self):
+        # 【Cutout】Triangle seem to have problem
+        holes = VGroup(*[
+            vm.scale(0.5)
+            for vm in [Triangle(), Circle(), RegularPolygon(6), Star(5)]
+        ]).arrange_in_grid(cols=2, buff=0.5)
+        vmob_to_cut = Square().scale(2)
+        c = Cutout(vmob_to_cut, *holes, fill_opacity=1,
+                   color=BLUE, stroke_color=RED)
+        c.scale(1.5)
+        self.play(DrawBorderThenFill(c), run_time=4)
+        self.wait()
+        self.remove(c)
+        self.wait()
+
+        # 【_BooleanOps】
+        boolop_circle = Circle(
+            fill_color=RED, fill_opacity=1).scale(0.65)
+        boolop_triange = Triangle(fill_color=RED, fill_opacity=1)
+
+        intersection_result = Intersection(
+            boolop_triange, boolop_circle, fill_color=RED, fill_opacity=1)
+        self.add(intersection_result)
+        self.wait(2)
+        self.remove(intersection_result)
+        self.wait()
+
+        exclusion_result = Exclusion(
+            boolop_triange, boolop_circle, fill_color=RED, fill_opacity=1)
+        self.add(exclusion_result)
+        self.wait()
+        movingArcPointSq = Square(
+            side_length=0.3, fill_color=BLUE, fill_opacity=1).move_to(exclusion_result.get_all_points()[0])
+        self.add(movingArcPointSq)
+        self.play(MoveAlongPath(movingArcPointSq,
+                  exclusion_result), run_time=2)
+        self.wait()
