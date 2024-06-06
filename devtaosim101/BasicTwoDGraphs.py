@@ -66,3 +66,52 @@ class AxesExample(Scene):
         axesGroup = VGroup(axes1, axes2).scale(0.5).arrange(RIGHT, buff=1)
         self.add(axesGroup)
         self.wait()
+
+
+class LineGraphExample(Scene):
+    def construct(self):
+        # axes = Axes(
+        #     x_range=(0, 7),
+        #     y_range=(0, 5),
+        #     x_length=7,
+        #     axis_config={"include_numbers": True},
+        # )
+        # axes.center()
+        # line_graph = axes.plot_line_graph(
+        #     x_values=[0, 1.5, 2, 3, 4, 6.3],
+        #     y_values=[1, 3, 2.5, 4, 2, 1.2],
+        #     line_color=BLUE,
+        #     vertex_dot_style={"stroke_width": 3, "fill_color": RED},
+        #     stroke_width=4,
+        # )
+        # self.add(axes)
+        # self.play(FadeIn(line_graph))
+        # self.wait()
+
+        axes = Axes(
+            x_range=(0, 7),
+            y_range=(0, 5),
+            x_length=7,
+            axis_config={"include_numbers": True},
+        )
+        axes.to_edge(UL)
+        x_values = [0, 1.5, 2, 3, 4, 6.3]
+        y_values = [1, 3, 2.5, 4, 2, 1.2]
+        coords = [axes.c2p(x, y) for x, y in zip(x_values, y_values)]
+        print(coords)
+        plot = VMobject(color=BLUE).set_points_as_corners(coords)
+
+        ap_group = VGroup(axes, plot)
+        self.add(ap_group)
+        self.play(ap_group.animate.scale(.7))
+        self.play(ap_group.animate.shift(RIGHT*2))
+        self.play(plot.animate.shift(RIGHT*2))
+        self.play(plot.animate.scale(2))
+        self.wait()
+
+        # Learning about Points and Coords
+        coords2 = [axes.c2p(x, y) for x, y in zip(x_values, y_values)]
+        print(coords2)
+        plot2 = VMobject(color=BLUE).set_points_as_corners(coords2)
+        self.play(ReplacementTransform(plot, plot2))
+        self.wait()
