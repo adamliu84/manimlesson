@@ -458,6 +458,62 @@ class AngleExample(Scene):
         self.wait()
 
 
+class AngleTwoExample(Scene):
+    def construct(self):
+        ANGLE_INCREMENT = 80
+        angleTracker = DecimalNumber(20, num_decimal_places=0).to_corner(UR)
+
+        number_plane = NumberPlane(axis_config={"include_numbers": True})
+        number_plane.set_opacity(0.3)
+
+        movingArc = Arc(2, angleTracker.get_value() *
+                        DEGREES, ANGLE_INCREMENT*DEGREES, color=GOLD)
+        arcs = VGroup(
+            Circle(radius=2, stroke_opacity=0.4),
+            movingArc,
+        )
+        self.add(angleTracker, number_plane, arcs)
+        self.play(movingArc.animate.rotate_about_origin(90*DEGREES))
+        angleTracker.set_value(angleTracker.get_value()+90)
+        self.wait()
+
+        def angle_tracker_updater(mob):
+            newmovingarc = Arc(2, angleTracker.get_value() *
+                               DEGREES, ANGLE_INCREMENT*DEGREES, color=GOLD)
+            mob.become(newmovingarc)
+        movingArc.add_updater(angle_tracker_updater)
+        self.play(
+            ChangeDecimalToValue(angleTracker, 200),
+            run_time=1
+        )
+        self.wait(2)
+        self.remove(movingArc)
+        self.wait()
+
+        # Experimenting...
+        angleTracker.set_value(0)
+
+        def getDefaultAnnularSector():
+            return AnnularSector(
+                inner_radius=1.75, outer_radius=2.15, angle=45 * DEGREES, color=RED)
+
+        def annular_sector_updater(mob):
+            newannularsector = getDefaultAnnularSector().rotate_about_origin(
+                angleTracker.get_value()*DEGREES)
+            mob.become(newannularsector)
+
+        annularSector = getDefaultAnnularSector()
+        annularSector.add_updater(annular_sector_updater)
+        self.add(annularSector)
+        self.play(
+            ChangeDecimalToValue(angleTracker, 7777),
+            run_time=10,
+            rate_func=there_and_back_with_pause
+
+        )
+        self.wait()
+
+
 class ArcPolygonsExample(Scene):
     def construct(self):
         # https://docs.manim.community/en/stable/reference/manim.mobject.geometry.arc.ArcPolygon.html
