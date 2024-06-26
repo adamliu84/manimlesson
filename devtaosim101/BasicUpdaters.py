@@ -200,6 +200,7 @@ class ValueTrackerAssignment(Scene):
         angleTracker = DecimalNumber(130, num_decimal_places=0).to_corner(UR)
         self.add(angleTracker)
 
+        # Moving Line/Axis
         moveline = Line(start=[0, 0, 0], end=[1, 0, 0])
         moveline.rotate_about_origin(angleTracker.get_value()*DEGREES)
 
@@ -209,8 +210,33 @@ class ValueTrackerAssignment(Scene):
             mob.become(moveline)
 
         moveline.add_updater(update_moveline)
+
+        # Fix Line/Axis
         fixLine = Line(start=[0, 0, 0], end=[1, 0, 0], color=RED)
-        self.add(fixLine, moveline)
+
+        # Angle
+        displayAngle = Angle(fixLine, moveline)
+
+        def update_displayAngle(mob):
+            displayAngle = Angle(fixLine, moveline)
+            mob.become(displayAngle)
+
+        displayAngle.add_updater(update_displayAngle)
+
+        # Text
+        import math
+        displayText = Text("ϑ", font_size=25).move_to(
+            displayAngle.point_from_proportion(0.5))
+
+        def update_displayText(mob):
+            displayText = Text(repr(math.floor(angleTracker.get_value())), font_size=25).move_to(
+                displayAngle.point_from_proportion(0.5))
+            mob.become(displayText)
+
+        displayText.add_updater(update_displayText)
+
+        # Adding int scene
+        self.add(fixLine, moveline, displayAngle, displayText)
         self.wait()
 
         self.play(
