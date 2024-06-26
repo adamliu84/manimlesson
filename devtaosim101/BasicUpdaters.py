@@ -332,32 +332,10 @@ class AnglesExample(Scene):
         angleTracker = DecimalNumber(0, num_decimal_places=0).to_corner(UR)
         self.add(angleTracker)
 
-        line1 = Line(LEFT + (1/3) * UP, RIGHT + (1/3) * DOWN)
-        line2 = Line(DOWN + (1/3) * RIGHT, UP + (1/3) * LEFT)
-        line2.rotate_about_origin(angleTracker.get_value()*DEGREES)
-        angles = [
-            Angle(line1, line2),
-            Angle(line1, line2, radius=0.4, quadrant=(1, -1), other_angle=True),
-            Angle(line1, line2, radius=0.5, quadrant=(-1, 1),
-                  stroke_width=8, other_angle=True),
-            Angle(line1, line2, radius=0.7, quadrant=(-1, -1), color=RED),
-            Angle(line1, line2, other_angle=True),
-            Angle(line1, line2, radius=0.4, quadrant=(1, -1)),
-            Angle(line1, line2, radius=0.5, quadrant=(-1, 1), stroke_width=8),
-            Angle(line1, line2, radius=0.7, quadrant=(-1, -1),
-                  color=RED, other_angle=True),
-        ]
-        plots = VGroup()
-        for angle in angles:
-            invRect = Rectangle(height=2.5, width=2.5)
-            plot = VGroup(line1.copy(), line2.copy(), angle, invRect)
-            plots.add(VGroup(plot, SurroundingRectangle(plot, buff=0.3)))
-        plots.arrange_in_grid(rows=2, buff=1)
-
-        def plots_updater(mob):
+        def gen_example(rotateDeg):
             line1 = Line(LEFT + (1/3) * UP, RIGHT + (1/3) * DOWN)
             line2 = Line(DOWN + (1/3) * RIGHT, UP + (1/3) * LEFT)
-            line2.rotate_about_origin(angleTracker.get_value()*DEGREES)
+            line2.rotate_about_origin(rotateDeg)
             angles = [
                 Angle(line1, line2),
                 Angle(line1, line2, radius=0.4,
@@ -374,11 +352,18 @@ class AnglesExample(Scene):
             ]
             plots = VGroup()
             for angle in angles:
-                invRect = Rectangle(height=2.5, width=2.5)
+                invRect = Rectangle(
+                    height=2.5, width=2.5).set_stroke(opacity=0)
                 plot = VGroup(line1.copy(), line2.copy(), angle, invRect)
-                plots.add(VGroup(plot, SurroundingRectangle(plot, buff=0)))
+                plots.add(VGroup(plot, SurroundingRectangle(
+                    plot, color=BLUE)))
             plots.arrange_in_grid(rows=2, buff=1)
+            return plots
+
+        def plots_updater(mob):
+            plots = gen_example(angleTracker.get_value()*DEGREES)
             mob.become(plots)
+        plots = gen_example(angleTracker.get_value()*DEGREES)
         plots.add_updater(plots_updater)
         self.add(plots)
         self.play(
