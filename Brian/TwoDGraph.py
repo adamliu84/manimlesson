@@ -96,3 +96,38 @@ class AreaUnderGraphExample(Scene):
       self.remove(rects_left, lines_right)
       self.wait()
 
+      # Derivatives sample
+      # https://github.com/brianamedee/Manim-Tutorials-2021/blob/main/5Tutorial_Adv2D.py#L45
+      # https://youtu.be/kXqAme1jCmg?t=46
+      self.remove(my_function)
+      my_function = my_plane.plot(lambda x: (1 / 3) * x ** 3, x_range=[-6,6], color = GREEN_B)
+      k = ValueTracker(-2)  # Tracking the end values of stuff to show
+      moving_slope = always_redraw(
+        lambda: my_plane.get_secant_slope_group(
+            x=k.get_value(),
+            graph=my_function,
+            dx=0.05,
+            secant_line_length=4,
+            secant_line_color=YELLOW,
+        )
+      )
+      dot = always_redraw(
+        lambda: Dot().move_to(
+        my_plane.c2p(k.get_value(), my_function.underlying_function(k.get_value()))
+        )
+      )
+
+      plane2 = (
+            NumberPlane(x_range=[-3, 4, 1], x_length=5, y_range=[0, 11, 2], y_length=5)
+            .add_coordinates()
+            .shift(LEFT * 3.5)
+      )
+      func2 = always_redraw(
+        lambda: plane2.plot(
+          lambda x: x ** 2, x_range=[-2.01, k.get_value()], color=GREEN
+        )
+      )
+      self.play(Create(my_function), Create(plane2))
+      self.add(moving_slope, dot, func2)
+      self.play(k.animate.set_value(2), run_time=5, rate_func=linear)
+      self.wait()
