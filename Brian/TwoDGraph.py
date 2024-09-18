@@ -162,3 +162,34 @@ class PolarPlaneExample(Scene):
     self.add(graph1, dot1, graph2, dot2)
     self.play(e.animate.set_value(PI), run_time = 10, rate_func = linear)
     self.wait()
+
+class ComplexPlaneExample(Scene):
+    def construct(self):
+        plane = ComplexPlane(axis_config = {"include_tip": True, "numbers_to_exclude": [0]}).add_coordinates()
+        labels = plane.get_axis_labels(x_label = "Real", y_label="Imaginary")
+
+        dot = Dot()
+        vect1 = plane.get_vector((2,0), stroke_color = YELLOW)
+        vect2 = Line(start = plane.c2p(2,0),
+        end = plane.c2p(2,-3), stroke_color = YELLOW).add_tip()
+
+        self.play(DrawBorderThenFill(plane), Write(labels))
+        self.wait()
+        self.play(GrowArrow(vect1), dot.animate.move_to(plane.c2p(2,0)), rate_func = linear, run_time = 2)
+        self.wait()
+        self.play(GrowFromPoint((vect2), point = vect2.get_start()),
+        dot.animate.move_to(plane.c2p(2,-3)), run_time = 2, rate_func = linear)
+        self.wait()
+
+        '''
+        why j instead of i
+        https://realpython.com/python-complex-numbers/
+        It’s a convention already adopted by engineers to avoid name collisions with electric current, which is denoted with the letter i.
+        In computing, the letter i is often used for the indexing variable in loops.
+        The letter i can be easily confused with l or 1 in source code.
+        '''
+        d1 = Dot(plane.n2p(2+2j), color=BLUE)
+        self.add(d1)
+        d1Arrow = Line(start = plane.n2p(0),end = plane.n2p(2+2j), stroke_color = YELLOW).add_tip()
+        self.play(GrowFromPoint((d1Arrow), point=d1Arrow.get_start()))
+        self.wait()
