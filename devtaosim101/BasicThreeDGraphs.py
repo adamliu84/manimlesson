@@ -43,3 +43,49 @@ class FirstThreeDExample(ThreeDScene):
     self.wait(2)
     self.move_camera(gamma=135*DEGREES, run_time=2, added_anims=[Write(Text("Z 135").move_to(UR*0.5))])
     self.wait(2)
+
+class ThreeDLinesAndParamFuncExample(ThreeDScene):
+  def construct(self):
+    axes_3d = ThreeDAxes(
+      # unit_size=1 in Z axis
+      z_range=(-3,3,1),
+      z_length=6,
+    )
+    self.set_camera_orientation(phi=70*DEGREES,theta=240*DEGREES)
+
+    # 3D Lines
+    main_line        = Line(ORIGIN,axes_3d.c2p(4,3)+2*OUT,color=RED)
+    vertical_line    = DashedLine(axes_3d.c2p(4,0),axes_3d.c2p(4,3))
+    horizontal_line  = DashedLine(axes_3d.c2p(0,3),axes_3d.c2p(4,3))
+    fall_line        = DashedLine(axes_3d.c2p(4,3),axes_3d.c2p(4,3)+OUT*2)
+    l_group = VGroup(main_line, vertical_line,horizontal_line,fall_line)
+
+    self.add(axes_3d)
+    self.add(l_group)
+    self.wait(1)
+    self.begin_ambient_camera_rotation(
+            rate=PI/2.5, about="theta"
+    )
+    self.wait(5)
+    self.stop_ambient_camera_rotation(about="theta")
+    self.remove(l_group)
+    self.wait(1)
+
+    # 3D Parametric
+    func = axes_3d.plot_parametric_curve(
+        lambda t: np.array([
+            2*np.cos(t),
+            3*np.sin(t),
+            t/3
+        ]),
+        t_range=(-2*PI,2*PI,0.01),
+        color=RED
+    )
+    self.add(func)
+    self.wait(1)
+    self.begin_ambient_camera_rotation(
+            rate=-PI/2.5, about="theta"
+    )
+    self.wait(2)
+    self.move_camera(phi=0,run_time=1,rate_func=rush_from)
+    self.wait(2)
