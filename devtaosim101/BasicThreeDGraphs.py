@@ -67,8 +67,20 @@ class ThreeDLinesAndParamFuncExample(ThreeDScene):
             rate=PI/2.5, about="theta"
     )
     self.wait(5)
-    self.stop_ambient_camera_rotation(about="theta")
+    # self.stop_ambient_camera_rotation(about="theta")
     self.remove(l_group)
+    self.wait(1)
+
+    # 3D Arrow
+    main_arrow        = Arrow3D(ORIGIN,axes_3d.c2p(4,3)+2*OUT,color=RED, base_radius=0.3)
+    vertical_arrow    = Arrow3D(axes_3d.c2p(4,0),axes_3d.c2p(4,3))
+    horizontal_arrow  = Arrow3D(axes_3d.c2p(0,3),axes_3d.c2p(4,3))
+    fall_arrow        = Arrow3D(axes_3d.c2p(4,3),axes_3d.c2p(4,3)+OUT*2)
+    a_group = VGroup(main_arrow, vertical_arrow,horizontal_arrow,fall_arrow)
+    self.play(Create(a_group))
+    self.wait(5)
+    self.stop_ambient_camera_rotation(about="theta")
+    self.remove(a_group)
     self.wait(1)
 
     # 3D Parametric
