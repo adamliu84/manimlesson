@@ -53,3 +53,18 @@ class Matrix(LinearTransformationScene):
         self.moving_mobjects = []
 
         self.wait()
+
+class Vectors(VectorScene):
+    def construct(self):
+
+        plane = self.add_plane(animate=True).add_coordinates()
+        basis = self.get_basis_vectors()
+        self.add(basis)
+        self.wait()
+        self.remove(basis)
+
+        vector = self.add_vector([-3, -2], color=YELLOW)
+        self.vector_to_coords(vector=vector)
+
+        vector2 = self.add_vector([2, 2], color=BLUE_C)
+        self.write_vector_coordinates(vector=vector2)
