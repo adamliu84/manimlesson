@@ -27,8 +27,6 @@ class ImageCount(Scene):
           self.wait(0.5)
           self.remove(num_group)
 
-
-
 class BasicAdditional(Scene):
       def construct(self):
         MAX_QUESTION = 10
